@@ -135,14 +135,6 @@ define bind::zone::primary (
     fail('You must include the bind base class before using any bind defined resources')
   }
 
-  if ($source and !empty($update_policy)) {
-    fail('The parameter source may not be used for a dynamic zone (update_policy is set)')
-  }
-
-  if ($content and !empty($update_policy)) {
-    fail('The parameter content may not be used for a dynamic zone (update_policy is set)')
-  }
-
   if $file {
     $zonefile = $file
   }
@@ -181,6 +173,7 @@ define bind::zone::primary (
       mode         => '0644',
       source       => $source,
       content      => $content,
+      replace      => ( empty($update_policy) ) ? { true => true, default => false },
       validate_cmd => "${bind::checkzone_program} -k fail -m fail -M fail -n fail ${zone} %",
       require      => Concat['named.conf.zones'],
     }
